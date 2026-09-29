@@ -69,12 +69,12 @@ STATE_MEANING = {
     "NOT_PUBLICLY_HOSTED": "No public managed service, sign-up, or endpoint.",
 }
 
-SURFACES = ["Telegram operator", "Web Admin", "ApexAPI", "ApexMCP", "Product plugin", "Hosted service"]
+SURFACES = ["Telegram operator", "Web console", "ApexAPI", "ApexMCP", "Product plugin", "Hosted service"]
 
 AVAILABILITY = {
-    "Scrapy": {
+    "Scrawl": {
         "Telegram operator": "IN_DEVELOPMENT",
-        "Web Admin": None,  # Scrapy has no Web Admin surface.
+        "Web console": None,  # Scrawl has no web console surface.
         "ApexAPI": "IN_DEVELOPMENT",
         "ApexMCP": "IN_DEVELOPMENT",
         "Product plugin": "IN_DEVELOPMENT",
@@ -82,7 +82,7 @@ AVAILABILITY = {
     },
     "Communications": {
         "Telegram operator": "IN_DEVELOPMENT",
-        "Web Admin": "IN_DEVELOPMENT",
+        "Web console": "IN_DEVELOPMENT",
         "ApexAPI": "IN_DEVELOPMENT",
         "ApexMCP": "PLANNED",
         "Product plugin": "PLANNED",
@@ -95,8 +95,8 @@ AVAILABILITY = {
 
 PRODUCTS = [
     {
-        "slug": "scrapy",
-        "name": "Scrapy",
+        "slug": "scrawl",
+        "name": "Scrawl",
         "code": "DATA",
         "category": "Web-data operations",
         "thesis": "Turn web sources into owned artifacts and versioned datasets.",
@@ -126,46 +126,47 @@ PRODUCTS = [
         "slug": "communications",
         "name": "Communications",
         "code": "COMMS",
-        "category": "Business communications",
-        "thesis": "Business communications on your own provider accounts, with consent and history built in.",
-        "job": "Reach customers on the right channel, with permission, and know afterward exactly what was sent, what came back, and why each send was allowed.",
-        "workflow": "Intent to evidence",
+        "category": "Customer support and business messaging",
+        "thesis": "Customer conversations on your own provider accounts, with consent, history, and your choice of AI.",
+        "job": "Answer and reach customers on the right channel, with permission, and know afterward exactly what was sent, what came back, who wrote it, and why each send was allowed.",
+        "workflow": "Support conversation",
         "steps": [
-            "Communication intent",
-            "Workspace and role",
-            "Consent and suppression",
-            "Trust and Safety gate",
-            "Workspace provider",
-            "Delivery and history",
+            "Customer writes in",
+            "Conversation opened or reopened",
+            "Person, automation, or allowed AI answers",
+            "Consent and Trust and Safety gate",
+            "Sent from the number they wrote to",
+            "Reply and provenance in history",
         ],
         "gate": 3,
         "capabilities": [
-            "Five channels, distinct contracts",
-            "Bring your own providers",
-            "Consent and suppression",
-            "Templates and automation",
+            "Customer support conversations",
+            "Your providers, your AI",
+            "Contacts, consent, suppression",
+            "Channels with their own rules",
             "History and audit",
-            "Trust, safety, and credits",
+            "Trust and Safety in the send path",
         ],
-        "execution": ["SMS · WhatsApp", "voice · email", "Telegram"],
-        "evidence": ["delivery state", "history · audit"],
+        "execution": ["SMS · WhatsApp", "Telegram · email"],
+        "evidence": ["conversations", "delivery · audit"],
     },
 ]
 
-HERO_LEDE = ("Two products that do real operating work, for the people who operate them, the software that "
-             "integrates with them, and the AI agents that act through them.")
+HERO_LEDE = ("Two products that do real operating work, collecting web data and running customer conversations, "
+             "for the people who operate them, the software that integrates with them, and the AI agents that act "
+             "through them.")
 HERO_RULE = "Each product owns its gate: every caller passes the same product policy."
 
 HEADS = {
     "availability": ("Public availability", "Opening for business soon.",
-                     "Scrapy and Communications are real products in active development. Sign-up, hosted access, "
+                     "Scrawl and Communications are real products in active development. Sign-up, hosted access, "
                      "and pricing open at launch."),
     "access": ("Access layers", "Software and agents reach the same product.",
                "Every caller reaches the product's own core, so adding a caller never adds a way around its "
                "rules. Each product ships its own contracts; there is no shared gateway."),
     "custom": ("Custom orders", "Bespoke software, scoped before it is built.",
                "Bots, integrations, automation, and agent tooling close to what ApexAi already builds in "
-               "Scrapy and Communications. Each request is scoped individually and quoted after scope is agreed."),
+               "Scrawl and Communications. Each request is scoped individually and quoted after scope is agreed."),
     "open": ("Open source", "Guides, kits, and tools you can use today.", None),
 }
 CUSTOM_NOTE = "ApexAi declines work that depends on bypassing consent, platform rules, access controls, or the law."
@@ -173,7 +174,7 @@ FOOTER_LINES = ("Web-data and business communications products for operators, so
                 "Designed and built independently by Logan P.")
 
 CALLERS = [
-    ("Operator", "Telegram · Web Admin"),
+    ("Operator", "Telegram · web console"),
     ("ApexAPI", "software · typed HTTP"),
     ("ApexMCP", "agents · MCP tools"),
 ]
@@ -184,14 +185,15 @@ ACCESS = [
     {
         "name": "ApexAPI",
         "caller": "HTTP · software",
-        "body": "Typed HTTP for applications that submit work, send communications, and read results and history.",
-        "specimen": [("Scrapy", ["POST /v1/scrape/crawl"]), ("Communications", ["POST /api/v1/communications"])],
+        "body": "Typed HTTP for applications that submit jobs, send messages, work support conversations, and read results and history.",
+        "specimen": [("Scrawl", ["POST /v1/scrape/crawl"]), ("Communications", ["POST /api/v1/communications"])],
     },
     {
         "name": "ApexMCP",
         "caller": "MCP · agents",
         "body": "Tools and resources that let agents discover, inspect, retrieve, and take named actions inside a product.",
-        "specimen": [("Scrapy tool", ["apex_scrapy_start_crawl"]), ("Scrapy resource", ["apex-scrapy://datasets"])],
+        # Real Scrawl MCP identifiers; they kept their apex_scrapy_ / apex-scrapy:// names through the rename.
+        "specimen": [("Scrawl tool", ["apex_scrapy_start_crawl"]), ("Scrawl resource", ["apex-scrapy://datasets"])],
     },
     {
         "name": "Product plugins",
@@ -207,7 +209,7 @@ FIT_AREAS = [
     ("WEB", "Web data", ["Scraping and crawling systems", "Extraction pipelines", "Monitoring and change detection"]),
     ("INT", "Integrations and APIs", ["API integrations", "Connecting existing services", "Webhooks and data sync"]),
     ("AGT", "Agents and AI tooling", ["MCP servers and agent integrations", "AI-assisted operator tooling", "Structured AI workflows"]),
-    ("OPS", "Operations and control", ["Admin and control surfaces", "Business process automation", "Extensions to Scrapy or Communications"]),
+    ("OPS", "Operations and control", ["Admin and control surfaces", "Business process automation", "Extensions to Scrawl or Communications"]),
 ]
 
 REPOS = [
@@ -484,7 +486,7 @@ def section_head(doc: Doc, key: str, y: float = 52, edge: float = EDGE, size: fl
 
 def hero():
     doc = Doc(W, 0, "ApexAi: web data and business communications",
-              "ApexAi builds Scrapy and Communications. Operators, software through ApexAPI, and AI agents through "
+              "ApexAi builds Scrawl and Communications. Operators, software through ApexAPI, and AI agents through "
               "ApexMCP reach each product through its own authority gate. Opening for business soon.")
 
     # Top bar: mark and wordmark, launch state.
@@ -560,7 +562,8 @@ def hero():
         doc.text(product["code"], cx + 7, top + 30, 9, wght=640, wdth=118, track=0.1, fill=TEXT_2)
         name_size = fit("Communications", cols["exec"] - cols["product"] - 40, 26, wght=600, wdth=114, track=-0.02)
         doc.text(product["name"], cx, top + 66, name_size, wght=600, wdth=114, track=-0.02)
-        doc.text(product["category"], cx, top + 88, 12, fill=TEXT_2)
+        category = wrap(product["category"], cols["exec"] - cols["product"] - 40, 12)
+        doc.lines(category, cx, top + 88 - 4 * (len(category) - 1), 12, 15, fill=TEXT_2)
         for key in ("execution", "evidence"):
             col = cols["exec" if key == "execution" else "evidence"]
             lines = product[key]
@@ -867,7 +870,7 @@ def badge_width(code: str, size: float = 9.5) -> float:
 
 def hero_narrow():
     doc = Doc(NW, 0, "ApexAi: web data and business communications",
-              "ApexAi builds Scrapy and Communications. Operators, software through ApexAPI, and AI agents through "
+              "ApexAi builds Scrawl and Communications. Operators, software through ApexAPI, and AI agents through "
               "ApexMCP reach each product through its own authority gate. Opening for business soon.")
     brand_mark(doc, NEDGE - 5, 18, 24)
     doc.text("ApexAi", NEDGE + 29, 36, 17, wght=640, wdth=118, track=-0.012)
@@ -955,9 +958,12 @@ def product_narrow(product: dict):
     doc = Doc(NW, 0, f"{product['name']}: {product['category'].lower()}",
               f"{product['thesis']} {product['job']} Workflow: " + ", then ".join(product["steps"]) + ".")
     width = NW - 2 * NEDGE
-    legend(doc, f"{product['code']} · {product['category']}", NEDGE, 42, size=10)
+    # A long category wraps onto a second legend line rather than shrinking below legible size.
+    legend_lines = wrap(f"{product['code']} · {product['category']}".upper(), width, 10, wght=620, wdth=125, track=0.15)
+    for i, line in enumerate(legend_lines):
+        legend(doc, line, NEDGE, 42 + 16 * i, size=10)
     size = fit("Communications", width + 6, 60, wght=560, wdth=125, track=-0.042)
-    y = 58 + size * .74
+    y = 58 + 16 * (len(legend_lines) - 1) + size * .74
     doc.text(product["name"], NEDGE - 4, y, size, wght=560, wdth=125, track=-0.042)
     y = doc.lines(wrap(product["thesis"], width, 17, wght=450), NEDGE, y + 44, 17, 24, wght=450)
     y = doc.lines(wrap(product["job"], width, 13.5), NEDGE, y + 30, 13.5, 20.5, fill=TEXT_2)
@@ -1032,8 +1038,8 @@ def availability_narrow():
     for code in STATES:
         badge(doc, code, NEDGE, y)
         y = doc.lines(wrap(STATE_MEANING[code], NW - 2 * NEDGE, 12), NEDGE, y + 30, 12, 18, fill=TEXT_2) + 32
-    if not all(AVAILABILITY["Scrapy"].values()):
-        y = doc.lines(["Scrapy has no Web Admin surface."], NEDGE, y - 6, 12, 18, fill=TEXT_3) + 32
+    if not all(AVAILABILITY["Scrawl"].values()):
+        y = doc.lines(["Scrawl has no web console surface."], NEDGE, y - 6, 12, 18, fill=TEXT_3) + 32
     doc.h = y - 8
     finish(doc)
     doc.save("availability-narrow.svg")
