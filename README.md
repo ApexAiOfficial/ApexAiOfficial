@@ -42,6 +42,6 @@ Each product owns its rules. A person working in Telegram, an application callin
   <sub>On Telegram:
   <a href="https://t.me/ApexAiOfficial">official updates</a> ·
   <a href="https://t.me/ApexAiCentral">community</a> ·
-  <a href="https://t.me/ApexAiScraperBot">Scrawl</a> ·
+  <a href="https://t.me/ApexAiScrawl_bot">Scrawl</a> ·
   <a href="https://t.me/ApexAiComms_bot">Communications</a></sub>
 </p>
