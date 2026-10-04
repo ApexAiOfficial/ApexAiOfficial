@@ -36,8 +36,11 @@ Each product owns its rules. A person working in Telegram, an application callin
 <a href="https://apexaiofficial.com"><picture><source media="(max-width: 640px)" srcset="assets/footer-narrow.svg"><img src="assets/footer.svg" width="100%" alt="ApexAi: web-data and business communications products for operators, software, and AI agents."></picture></a>
 
 <p align="center">
-  <a href="https://apexaiofficial.com">apexaiofficial.com</a> ·
-  <a href="mailto:support@apexaiofficial.com">support@apexaiofficial.com</a>
+  <a href="https://apexaiofficial.com">apexaiofficial.com</a>
+  <br>
+  Sales: <a href="mailto:sales@apexaiofficial.com">sales@apexaiofficial.com</a>
+  <br>
+  Support: <a href="mailto:support@apexaiofficial.com">support@apexaiofficial.com</a>
   <br>
   <sub>On Telegram:
   <a href="https://t.me/ApexAiOfficial">official updates</a> ·
