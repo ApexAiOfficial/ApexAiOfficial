@@ -69,10 +69,11 @@ STATE_MEANING = {
     "NOT_PUBLICLY_HOSTED": "No public managed service, sign-up, or endpoint.",
 }
 
-SURFACES = ["Telegram operator", "Web console", "ApexAPI", "ApexMCP", "Product plugin", "Hosted service"]
+SURFACES = ["Operations engine", "Telegram operator", "Web console", "ApexAPI", "ApexMCP", "Product plugin", "Hosted service"]
 
 AVAILABILITY = {
     "Scrawl": {
+        "Operations engine": None,  # Tracked only for DevOps, whose engine and service differ.
         "Telegram operator": "IN_DEVELOPMENT",
         "Web console": None,  # Scrawl has no web console surface.
         "ApexAPI": "IN_DEVELOPMENT",
@@ -81,11 +82,21 @@ AVAILABILITY = {
         "Hosted service": "NOT_PUBLICLY_HOSTED",
     },
     "Communications": {
+        "Operations engine": None,
         "Telegram operator": "IN_DEVELOPMENT",
         "Web console": "IN_DEVELOPMENT",
         "ApexAPI": "IN_DEVELOPMENT",
         "ApexMCP": "PLANNED",
         "Product plugin": "PLANNED",
+        "Hosted service": "NOT_PUBLICLY_HOSTED",
+    },
+    "DevOps": {
+        "Operations engine": "IN_DEVELOPMENT",
+        "Telegram operator": None,  # No operator surface is defined for customers yet.
+        "Web console": None,
+        "ApexAPI": "PLANNED",
+        "ApexMCP": "PLANNED",
+        "Product plugin": None,  # DevOps is an operations product, not a plugin for one.
         "Hosted service": "NOT_PUBLICLY_HOSTED",
     },
 }
@@ -150,27 +161,58 @@ PRODUCTS = [
         "execution": ["SMS · WhatsApp", "Telegram · email"],
         "evidence": ["conversations", "delivery · audit"],
     },
+    {
+        "slug": "devops",
+        "name": "DevOps",
+        "code": "OPS",
+        "category": "Autonomous operations",
+        "thesis": "Find what broke, fix it within the authority you grant, and prove the fix held.",
+        "job": "Keep systems in their intended state without giving automation open-ended power: notice what is wrong, apply only a remedy that is allowed, and call it fixed only when a fresh observation shows that it is.",
+        "workflow": "Incident to verified resolution",
+        "steps": [
+            "Declared condition fails",
+            "One incident opened",
+            "Allowed remedy selected",
+            "Single-use grant issued",
+            "Action run within its bound",
+            "Fresh verification",
+            "Stability window held",
+            "Closed with evidence",
+        ],
+        "gate": 3,
+        "capabilities": [
+            "Detection with one identity per incident",
+            "Remedies in a fixed order",
+            "Authorized, bounded execution",
+            "Verification by observation",
+            "Rollback, compensation, escalation",
+            "Supervision that survives restarts",
+        ],
+        "execution": ["remedy · rollback", "compensation"],
+        "evidence": ["verification", "audit"],
+    },
 ]
 
-HERO_LEDE = ("Two products that do real operating work, collecting web data and running customer conversations, "
-             "for the people who operate them, the software that integrates with them, and the AI agents that act "
-             "through them.")
+HERO_LEDE = ("Three products that do real operating work, collecting web data, running customer conversations, and "
+             "keeping systems in their intended state, for the people who operate them, the software that integrates "
+             "with them, and the AI agents that act through them.")
 HERO_RULE = "Each product owns its gate: every caller passes the same product policy."
 
 HEADS = {
     "availability": ("Public availability", "Opening for business soon.",
-                     "Scrawl and Communications are real products in active development. Sign-up, hosted access, "
-                     "and pricing open at launch."),
+                     "Scrawl and Communications are real products in active development, and the engine behind "
+                     "DevOps is too; the DevOps managed service is planned. Sign-up, hosted access, and pricing open "
+                     "at launch."),
     "access": ("Access layers", "Software and agents reach the same product.",
                "Every caller reaches the product's own core, so adding a caller never adds a way around its "
                "rules. Each product ships its own contracts; there is no shared gateway."),
     "custom": ("Custom orders", "Bespoke software, scoped before it is built.",
-               "Bots, integrations, automation, and agent tooling close to what ApexAi already builds in "
-               "Scrawl and Communications. Each request is scoped individually and quoted after scope is agreed."),
+               "Bots, integrations, automation, and agent tooling close to what ApexAi already builds in its "
+               "products. Each request is scoped individually and quoted after scope is agreed."),
     "open": ("Open source", "Guides, kits, and tools you can use today.", None),
 }
 CUSTOM_NOTE = "ApexAi declines work that depends on bypassing consent, platform rules, access controls, or the law."
-FOOTER_LINES = ("Web-data and business communications products for operators, software, and AI agents.",
+FOOTER_LINES = ("Web-data, business communications, and autonomous operations products for operators, software, and AI agents.",
                 "Designed and built independently by Logan P.")
 
 CALLERS = [
@@ -179,7 +221,9 @@ CALLERS = [
     ("ApexMCP", "agents · MCP tools"),
 ]
 # (caller index, product index) routes that are planned rather than in the product.
-PLANNED_ROUTES = {(2, 1)}
+PLANNED_ROUTES = {(2, 1), (1, 2), (2, 2)}
+# (caller index, product index) pairs with no route at all: DevOps has no operator surface.
+ABSENT_ROUTES = {(0, 2)}
 
 ACCESS = [
     {
@@ -485,7 +529,7 @@ def section_head(doc: Doc, key: str, y: float = 52, edge: float = EDGE, size: fl
 
 
 def hero():
-    doc = Doc(W, 0, "ApexAi: web data and business communications",
+    doc = Doc(W, 0, "ApexAi: web data, business communications, and autonomous operations",
               "ApexAi builds Scrawl and Communications. Operators, software through ApexAPI, and AI agents through "
               "ApexMCP reach each product through its own authority gate. Opening for business soon.")
 
@@ -498,19 +542,20 @@ def hero():
             f'<circle cx="{lx:.1f}" cy="34" r="4" fill="none" stroke="{AMBER}" stroke-width="1.5"/>')
 
     # Statement.
-    head = ["Web data and business", "communications."]
+    head = ["Web data, business", "communications, and", "autonomous operations."]
     size = min(fit(head[0], 800, 64, wght=560, wdth=112, track=-0.042), 64)
     y = 88 + size
     for i, line in enumerate(head):
         doc.text(line, EDGE - 4, y + i * size * 1.0, size, wght=560, wdth=112, track=-0.042)
-    y += size * 1.0
+    y += size * (len(head) - 1)
     y = doc.lines(wrap(HERO_LEDE, 640, 17), EDGE, y + 46, 17, 26, fill=TEXT_2)
 
     # Authority Path.
     px, py, pw = 24, y + 34, W - 48
     cols = {"caller": 24, "route": 214, "gate": 332, "product": 358, "exec": 580, "evidence": 716, "end": 856}
-    header_h, row_c, row_p, foot_h = 36, 74, 111, 46
-    body_h = row_c * 3
+    header_h, row_p, foot_h = 36, 111, 46
+    body_h = row_p * len(PRODUCTS)  # one product row each; the three caller rows share the same height
+    row_c = body_h / 3
     ph = header_h + body_h + foot_h
     inset(doc, px, py, pw, ph)
 
@@ -574,6 +619,8 @@ def hero():
     routes, pulses = [], []
     for i, (jx, jy) in enumerate(jacks):
         for j in range(len(PRODUCTS)):
+            if (i, j) in ABSENT_ROUTES:
+                continue
             sx, sy = sockets[(i, j)]
             x1, x2 = jx + 6, sx - 6
             mid = (x1 + x2) / 2
@@ -587,6 +634,8 @@ def hero():
     for jx, jy in jacks:
         doc.add(f'<circle cx="{jx}" cy="{jy:.1f}" r="5.5" fill="{PANEL}" stroke="{SEAM_LIT}" stroke-width="1.5"/>')
     for (i, j), (sx, sy) in sockets.items():
+        if (i, j) in ABSENT_ROUTES:
+            continue
         planned = (i, j) in PLANNED_ROUTES
         stroke = f'stroke="{AMBER}" stroke-opacity=".7" stroke-dasharray="2 2"' if planned else f'stroke="{SEAM_LIT}"'
         doc.add(f'<circle cx="{sx}" cy="{sy:.1f}" r="5" fill="{PANEL}" {stroke} stroke-width="1.5"/>')
@@ -642,14 +691,15 @@ def product_plate(product: dict):
     doc = Doc(W, 0, f"{product['name']}: {product['category'].lower()}",
               f"{product['thesis']} {product['job']} Workflow: " + ", then ".join(product["steps"]) + ".")
     n = len(product["steps"])
-    cw = (W - 48) / n  # rail station width; the plate's columns snap to it
+    cw = (W - 48) / n  # rail station width
+    grid = (W - 48) / 6  # the plate's columns: thirds and halves of the width, whatever the rail's length
     legend(doc, f"{product['code']} · {product['category']}", EDGE, 52)
     doc.text(product["name"], EDGE - 7, 132, 76, wght=560, wdth=125, track=-0.042)
 
     y = 184
-    half = cw * 3 - 40
+    half = grid * 3 - 40
     left = doc.lines(wrap(product["thesis"], half, 19, wght=450), EDGE, y, 19, 27, wght=450)
-    right = doc.lines(wrap(product["job"], half, 14.5), 24 + cw * 3 + 20, y - 2, 14.5, 22.5, fill=TEXT_2)
+    right = doc.lines(wrap(product["job"], half, 14.5), 24 + grid * 3 + 20, y - 2, 14.5, 22.5, fill=TEXT_2)
     y = max(left, right) + 50
 
     # Stage rail: the product's workflow, in order, with its authority gate marked.
@@ -671,7 +721,11 @@ def product_plate(product: dict):
             doc.add(f'<rect x="{x + 1:.1f}" y="{ry + 1}" width="{cw - 1:.1f}" height="{rh - 2}" fill="url(#gatewash)"/>')
         if i:
             vline(doc, x, ry + 1, ry + rh - 1)
-        doc.text(f"{i + 1:02d}", x + 20, ry + 24, 10, face="mono", wdth=88, fill=TEXT_3)
+        index = f"{i + 1:02d}"
+        tag_x = x + cw - 24 - measure("AUTHORITY", 8, wght=640, wdth=118, track=0.1)
+        # On a long rail the gate's tag does not fit beside its index; the tag then stands in for it.
+        if i != product["gate"] or tag_x > x + 20 + measure(index, 10, face="mono", wdth=88) + 6:
+            doc.text(index, x + 20, ry + 24, 10, face="mono", wdth=88, fill=TEXT_3)
         seg = f'M{x + (25 if i == 0 else 1):.1f} {rail_y + .5}H{x + cw:.1f}'
         doc.add(f'<path d="{seg}" stroke="{"url(#lead)" if i == 0 else SEAM_LIT}"/>')
         nx = x + 25
@@ -694,11 +748,11 @@ def product_plate(product: dict):
     caps = product["capabilities"]
     top = ry + rh + 34
     for i, cap in enumerate(caps):
-        x = 24 + cw * 2 * (i % 3)
+        x = 24 + grid * 2 * (i % 3)
         y = top + 26 * (i // 3)
         doc.add(f'<path d="M{x + 20.5:.1f} {y - 10}v13" stroke="{SEAM_LIT}"/>')
         doc.text(cap, x + 30, y, 12.5, fill=TEXT_2)
-        assert measure(cap, 12.5) < cw * 2 - 40, cap
+        assert measure(cap, 12.5) < grid * 2 - 40, cap
     doc.h = top + 26 * ((len(caps) - 1) // 3) + 34
     finish(doc)
     doc.save(f"{product['slug']}.svg")
@@ -869,7 +923,7 @@ def badge_width(code: str, size: float = 9.5) -> float:
 
 
 def hero_narrow():
-    doc = Doc(NW, 0, "ApexAi: web data and business communications",
+    doc = Doc(NW, 0, "ApexAi: web data, business communications, and autonomous operations",
               "ApexAi builds Scrawl and Communications. Operators, software through ApexAPI, and AI agents through "
               "ApexMCP reach each product through its own authority gate. Opening for business soon.")
     brand_mark(doc, NEDGE - 5, 18, 24)
@@ -879,12 +933,12 @@ def hero_narrow():
     doc.add(f'<circle cx="{lx:.1f}" cy="30.5" r="6.5" fill="{AMBER}" fill-opacity=".12"/>'
             f'<circle cx="{lx:.1f}" cy="30.5" r="3.6" fill="none" stroke="{AMBER}" stroke-width="1.4"/>')
 
-    head = ["Web data and", "business", "communications."]
+    head = ["Web data,", "business", "communications,", "and autonomous", "operations."]
     size = fit(head[-1], NW - 2 * NEDGE + 4, 46, wght=560, wdth=112, track=-0.042)
     y = 70 + size
     for i, line in enumerate(head):
         doc.text(line, NEDGE - 3, y + i * size, size, wght=560, wdth=112, track=-0.042)
-    y = doc.lines(wrap(HERO_LEDE, NW - 2 * NEDGE, 15), NEDGE, y + size * 2 + 38, 15, 22.5, fill=TEXT_2)
+    y = doc.lines(wrap(HERO_LEDE, NW - 2 * NEDGE, 15), NEDGE, y + size * (len(head) - 1) + 38, 15, 22.5, fill=TEXT_2)
 
     px, py, pw = NIN, y + 30, NW - 2 * NIN
     cw = pw / 3
@@ -907,6 +961,8 @@ def hero_narrow():
         doc.add(f'<rect x="{px + 16}" y="{gy - 1}" width="{pw - 32}" height="2" rx="1" fill="{SIGNAL}" class="gate"/>',
                 f'<rect x="{px + 16}" y="{gy - 4}" width="{pw - 32}" height="8" rx="4" fill="{SIGNAL}" fill-opacity=".14" class="gate-glow"/>')
         for i, cx in enumerate(centers):
+            if (i, j) in ABSENT_ROUTES:
+                continue
             if (i, j) in PLANNED_ROUTES:
                 doc.add(f'<circle cx="{cx:.1f}" cy="{gy}" r="6" fill="{GROUND}" stroke="{AMBER}" stroke-width="1.5" stroke-dasharray="2 2"/>')
             else:
