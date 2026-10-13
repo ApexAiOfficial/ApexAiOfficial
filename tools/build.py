@@ -205,7 +205,8 @@ HEADS = {
                      "at launch."),
     "access": ("Access layers", "Software and agents reach the same product.",
                "Every caller reaches the product's own core, so adding a caller never adds a way around its "
-               "rules. Each product ships its own contracts; there is no shared gateway."),
+               "rules. Each product owns its contracts, and there is no shared gateway; DevOps access through "
+               "ApexAPI and ApexMCP is planned."),
     "custom": ("Custom orders", "Bespoke software, scoped before it is built.",
                "Bots, integrations, automation, and agent tooling close to what ApexAi already builds in its "
                "products. Each request is scoped individually and quoted after scope is agreed."),
