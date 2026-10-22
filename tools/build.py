@@ -261,8 +261,7 @@ HEADS = {
     "open": ("Open source", "Guides, kits, and tools you can use today.", None),
 }
 CUSTOM_NOTE = "ApexAi declines work that depends on bypassing consent, platform rules, access controls, or the law."
-FOOTER_LINES = ("Web-data, business communications, autonomous operations, and Telegram commerce products for operators, software, and AI agents.",
-                "Designed and built independently by Logan P.")
+FOOTER_LINES = ("Web-data, business communications, autonomous operations, and Telegram commerce products for operators, software, and AI agents.",)
 
 CALLERS = [
     ("Operator", "Telegram · web console"),
@@ -967,8 +966,11 @@ def footer(narrow: bool = False):
     for line in wrap(FOOTER_LINES[0], w - 2 * NEDGE, 14 if not narrow else 13):
         doc.text(line, w / 2, y, 14 if not narrow else 13, fill=TEXT_2, anchor="middle")
         y += 20
-    doc.text(FOOTER_LINES[1], w / 2, y + 6, 12.5 if not narrow else 12, fill=TEXT_3, anchor="middle")
-    doc.h = y + 38
+    # Any further lines are quieter notes beneath the statement; the plate keeps 32px below the last baseline.
+    for note in FOOTER_LINES[1:]:
+        doc.text(note, w / 2, y + 6, 12.5 if not narrow else 12, fill=TEXT_3, anchor="middle")
+        y += 26
+    doc.h = y + 12
     finish(doc, fill="#06090c", glow=(w / 2, 40))
     doc.save("footer-narrow.svg" if narrow else "footer.svg")
 
