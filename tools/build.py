@@ -57,35 +57,39 @@ EDGE = 44  # Shared left text edge: 24px inset margin + 20px cell padding.
 # ---------------------------------------------------------------------------
 # Public availability (mirror of apexaiofficial.com content/availability.ts)
 
+# Lamps follow the website: Built is a lit lamp, In development an unlit ring, Planned a dashed amber plate.
 STATES = {
-    "IN_DEVELOPMENT": ("In development", SIGNAL_HI, "rgba(114,170,255,.45)", SIGNAL, "solid"),
+    "BUILT": ("Built", SIGNAL_HI, "rgba(114,170,255,.55)", SIGNAL, "solid"),
+    "IN_DEVELOPMENT": ("In development", SIGNAL_HI, "rgba(114,170,255,.38)", SIGNAL, "ring"),
     "PLANNED": ("Planned", "#f2cf9f", "rgba(229,163,82,.55)", AMBER, "dashed"),
     "NOT_PUBLICLY_HOSTED": ("Not publicly hosted", "#efc0c0", "rgba(223,138,138,.42)", ROSE, "ring"),
 }
 
 STATE_MEANING = {
-    "IN_DEVELOPMENT": "Implemented in current development source; not generally released.",
+    "BUILT": "Built and verified in the product, not yet released to customers.",
+    "IN_DEVELOPMENT": "Being built: partly implemented, or complete but not yet merged and verified.",
     "PLANNED": "Part of the product direction; not built yet.",
     "NOT_PUBLICLY_HOSTED": "No public managed service, sign-up, or endpoint.",
 }
 
 SURFACES = ["Operations engine", "Telegram operator", "Web console", "ApexAPI", "ApexMCP", "Product plugin", "Hosted service"]
 
+# None means the product does not have that surface (the website shows a dash): never a state of its own.
 AVAILABILITY = {
     "Scrawl": {
         "Operations engine": None,  # Tracked only for DevOps, whose engine and service differ.
-        "Telegram operator": "IN_DEVELOPMENT",
+        "Telegram operator": "BUILT",
         "Web console": None,  # Scrawl has no web console surface.
-        "ApexAPI": "IN_DEVELOPMENT",
-        "ApexMCP": "IN_DEVELOPMENT",
+        "ApexAPI": "BUILT",
+        "ApexMCP": "BUILT",
         "Product plugin": "IN_DEVELOPMENT",
         "Hosted service": "NOT_PUBLICLY_HOSTED",
     },
     "Communications": {
         "Operations engine": None,
-        "Telegram operator": "IN_DEVELOPMENT",
-        "Web console": "IN_DEVELOPMENT",
-        "ApexAPI": "IN_DEVELOPMENT",
+        "Telegram operator": "BUILT",
+        "Web console": "BUILT",
+        "ApexAPI": "BUILT",
         "ApexMCP": "PLANNED",
         "Product plugin": "PLANNED",
         "Hosted service": "NOT_PUBLICLY_HOSTED",
@@ -99,6 +103,15 @@ AVAILABILITY = {
         "Product plugin": None,  # DevOps is an operations product, not a plugin for one.
         "Hosted service": "NOT_PUBLICLY_HOSTED",
     },
+    "Shop Bot": {
+        "Operations engine": None,
+        "Telegram operator": "BUILT",  # The merchant's staff run the store from the bot's admin commands.
+        "Web console": None,
+        "ApexAPI": None,  # Shop Bot is used in Telegram only: no ApexAPI or ApexMCP surface, current or planned.
+        "ApexMCP": None,
+        "Product plugin": None,
+        "Hosted service": "NOT_PUBLICLY_HOSTED",  # The managed white-label service is planned.
+    },
 }
 
 # ---------------------------------------------------------------------------
@@ -110,27 +123,27 @@ PRODUCTS = [
         "name": "Scrawl",
         "code": "DATA",
         "category": "Web-data operations",
-        "thesis": "Turn web sources into owned artifacts and versioned datasets.",
+        "thesis": "Turn web pages into clean, versioned data you own and can cite.",
         "job": "Collect web content reliably and keep what was collected: the files, the records, and the evidence of how they were produced.",
-        "workflow": "Source to dataset",
+        "workflow": "URL to structured data",
         "steps": [
-            "Choose a cataloged source",
-            "Pass the policy and egress gate",
-            "Crawl, fetch, or render",
-            "Classify and store artifacts",
-            "Publish a dataset version",
-            "Search and fetch records",
+            "Send a URL and a schema",
+            "Pass the egress gate",
+            "Fetch the page once",
+            "Convert to Markdown",
+            "Extract with your AI",
+            "Validate against the schema",
         ],
         "gate": 1,
         "capabilities": [
-            "Multi-engine execution",
-            "Browser rendering",
-            "Artifacts and media",
-            "Jobs and evidence",
+            "One call, usable content",
+            "Your AI, governed",
             "Versioned datasets",
+            "Jobs that finish once",
+            "Artifacts and media",
             "Your proxies, explicit egress",
         ],
-        "execution": ["crawl · fetch", "render · extract"],
+        "execution": ["scrape · map", "crawl · extract"],
         "evidence": ["artifacts", "dataset versions"],
     },
     {
@@ -138,25 +151,25 @@ PRODUCTS = [
         "name": "Communications",
         "code": "COMMS",
         "category": "Customer support and business messaging",
-        "thesis": "Customer conversations on your own provider accounts, with consent, history, and your choice of AI.",
+        "thesis": "One support inbox for SMS, WhatsApp, and Telegram, on your own provider accounts.",
         "job": "Answer and reach customers on the right channel, with permission, and know afterward exactly what was sent, what came back, who wrote it, and why each send was allowed.",
         "workflow": "Support conversation",
         "steps": [
             "Customer writes in",
             "Conversation opened or reopened",
-            "Person, automation, or allowed AI answers",
+            "Teammate or automation answers",
             "Consent and Trust and Safety gate",
             "Sent from the number they wrote to",
             "Reply and provenance in history",
         ],
         "gate": 3,
         "capabilities": [
-            "Customer support conversations",
-            "Your providers, your AI",
+            "A shared support inbox",
+            "Three conversation channels, one inbox",
+            "Your providers, set up for you",
+            "Your team, wherever it works",
             "Contacts, consent, suppression",
-            "Channels with their own rules",
-            "History and audit",
-            "Trust and Safety in the send path",
+            "Trust, history, and audit",
         ],
         "execution": ["SMS · WhatsApp", "Telegram · email"],
         "evidence": ["conversations", "delivery · audit"],
@@ -191,29 +204,64 @@ PRODUCTS = [
         "execution": ["remedy · rollback", "compensation"],
         "evidence": ["verification", "audit"],
     },
+    {
+        "slug": "shop",
+        "name": "Shop Bot",
+        "code": "SHOP",
+        "category": "Digital commerce on Telegram",
+        "thesis": "Sell digital products inside Telegram, paid in Stars and delivered once per payment.",
+        "job": "Sell digital products where customers already are, take payment in Telegram Stars, and deliver exactly what was paid for, once, with a record of every charge, delivery, and refund.",
+        "workflow": "Order to delivery",
+        "steps": [
+            "Customer checks out",
+            "Signed Stars invoice",
+            "Pre-checkout check",
+            "Telegram charges Stars",
+            "Receipt on the ledger",
+            "Files and keys delivered",
+        ],
+        "gate": 2,
+        "capabilities": [
+            "A store inside Telegram",
+            "Stars payments on a ledger",
+            "Delivery on payment",
+            "Memberships",
+            "Refunds that revoke access",
+            "Run the store from Telegram",
+        ],
+        "execution": ["checkout", "delivery · refund"],
+        "evidence": ["Stars ledger", "audit"],
+    },
 ]
 
-HERO_LEDE = ("Three products that do real operating work, collecting web data, running customer conversations, and "
-             "keeping systems in their intended state, for the people who operate them, the software that integrates "
-             "with them, and the AI agents that act through them.")
+HERO_HEAD = "Web data, communications, operations, and commerce."
+HERO_LEDE = ("Four products that do real operating work: turning web pages into data you can cite, answering customers as "
+             "a team on your own provider accounts, keeping systems in their intended state, and selling digital products "
+             "inside Telegram. People operate all four; Scrawl, Communications, and DevOps are also built for software "
+             "that integrates through ApexAPI and AI agents that act through ApexMCP.")
 HERO_RULE = "Each product owns its gate: every caller passes the same product policy."
+HERO_TITLE = "ApexAi: web data, business communications, autonomous operations, and Telegram commerce"
+HERO_DESC = ("ApexAi builds Scrawl, Communications, DevOps, and Shop Bot. Operators, software through ApexAPI, and AI agents "
+             "through ApexMCP reach each product through its own authority gate; DevOps access through ApexAPI and ApexMCP "
+             "is planned, and Shop Bot is used in Telegram only. Opening for business soon.")
+
 
 HEADS = {
     "availability": ("Public availability", "Opening for business soon.",
-                     "Scrawl and Communications are real products in active development, and the engine behind "
-                     "DevOps is too; the DevOps managed service is planned. Sign-up, hosted access, and pricing open "
-                     "at launch."),
+                     "Scrawl and Communications are in development with their core capabilities built, and Shop Bot "
+                     "is built; the DevOps engine is in development, and the managed DevOps and Shop Bot services are "
+                     "planned. Sign-up, hosted access, and pricing open at launch."),
     "access": ("Access layers", "Software and agents reach the same product.",
                "Every caller reaches the product's own core, so adding a caller never adds a way around its "
-               "rules. Each product owns its contracts, and there is no shared gateway; DevOps access through "
-               "ApexAPI and ApexMCP is planned."),
+               "rules. Each product owns its contracts, and there is no shared gateway. DevOps access through "
+               "ApexAPI and ApexMCP is planned; Shop Bot is used in Telegram only."),
     "custom": ("Custom orders", "Bespoke software, scoped before it is built.",
                "Bots, integrations, automation, and agent tooling close to what ApexAi already builds in its "
                "products. Each request is scoped individually and quoted after scope is agreed."),
     "open": ("Open source", "Guides, kits, and tools you can use today.", None),
 }
 CUSTOM_NOTE = "ApexAi declines work that depends on bypassing consent, platform rules, access controls, or the law."
-FOOTER_LINES = ("Web-data, business communications, and autonomous operations products for operators, software, and AI agents.",
+FOOTER_LINES = ("Web-data, business communications, autonomous operations, and Telegram commerce products for operators, software, and AI agents.",
                 "Designed and built independently by Logan P.")
 
 CALLERS = [
@@ -221,24 +269,28 @@ CALLERS = [
     ("ApexAPI", "software · typed HTTP"),
     ("ApexMCP", "agents · MCP tools"),
 ]
+# Each caller's route into a product takes its state from that product's surface, as on the website's Authority Path.
+CALLER_SURFACES = ["Telegram operator", "ApexAPI", "ApexMCP"]
 # (caller index, product index) routes that are planned rather than in the product.
-PLANNED_ROUTES = {(2, 1), (1, 2), (2, 2)}
-# (caller index, product index) pairs with no route at all: DevOps has no operator surface.
-ABSENT_ROUTES = {(0, 2)}
+PLANNED_ROUTES = {(i, j) for i, surface in enumerate(CALLER_SURFACES) for j, p in enumerate(PRODUCTS)
+                  if AVAILABILITY[p["name"]][surface] == "PLANNED"}
+# (caller index, product index) pairs with no route at all: DevOps has no operator surface, Shop Bot no ApexAPI or ApexMCP.
+ABSENT_ROUTES = {(i, j) for i, surface in enumerate(CALLER_SURFACES) for j, p in enumerate(PRODUCTS)
+                 if AVAILABILITY[p["name"]][surface] is None}
 
 ACCESS = [
     {
         "name": "ApexAPI",
         "caller": "HTTP · software",
         "body": "Typed HTTP for applications that submit jobs, send messages, work support conversations, and read results and history.",
-        "specimen": [("Scrawl", ["POST /v1/scrape/crawl"]), ("Communications", ["POST /api/v1/communications"])],
+        "specimen": [("Scrawl", ["POST /v1/scrape"]), ("Communications", ["POST /api/v1/communications"])],
     },
     {
         "name": "ApexMCP",
         "caller": "MCP · agents",
         "body": "Tools and resources that let agents discover, inspect, retrieve, and take named actions inside a product.",
         # Real Scrawl MCP identifiers; they kept their apex_scrapy_ / apex-scrapy:// names through the rename.
-        "specimen": [("Scrawl tool", ["apex_scrapy_start_crawl"]), ("Scrawl resource", ["apex-scrapy://datasets"])],
+        "specimen": [("Scrawl tool", ["apex_scrapy_scrape_url"]), ("Scrawl resource", ["apex-scrapy://datasets"])],
     },
     {
         "name": "Product plugins",
@@ -483,10 +535,12 @@ def ext_arrow(doc: Doc, x: float, y: float, size: float, color: str):
     )
 
 
-def badge(doc: Doc, code: str, x: float, cy: float, size: float = 9.5) -> float:
+def badge(doc: Doc, code: str, x: float, cy: float, size: float = 9.5, compact: bool = False) -> float:
+    """A status plate. `compact` narrows the letterforms so four products fit side by side."""
     label, fg, border, lamp, kind = STATES[code]
     text = label.upper()
-    tw = measure(text, size, wght=640, wdth=118, track=0.1)
+    wdth, track = (100, 0.06) if compact else (118, 0.1)
+    tw = measure(text, size, wght=640, wdth=wdth, track=track)
     h, pad_l, lamp_gap, pad_r = 22, 9, 8, 9
     w = pad_l + 6 + lamp_gap + tw + pad_r
     dash = ' stroke-dasharray="3 3"' if kind == "dashed" else ""
@@ -496,7 +550,7 @@ def badge(doc: Doc, code: str, x: float, cy: float, size: float = 9.5) -> float:
         doc.add(f'<circle cx="{lx:.1f}" cy="{cy:.1f}" r="5" fill="{lamp}" fill-opacity=".18"/><circle cx="{lx:.1f}" cy="{cy:.1f}" r="3" fill="{lamp}"/>')
     else:
         doc.add(f'<circle cx="{lx:.1f}" cy="{cy:.1f}" r="2.6" fill="none" stroke="{lamp}" stroke-width="1.1"/>')
-    doc.text(text, x + pad_l + 6 + lamp_gap, cy + size * .36, size, wght=640, wdth=118, track=0.1, fill=fg)
+    doc.text(text, x + pad_l + 6 + lamp_gap, cy + size * .36, size, wght=640, wdth=wdth, track=track, fill=fg)
     return w
 
 
@@ -530,9 +584,7 @@ def section_head(doc: Doc, key: str, y: float = 52, edge: float = EDGE, size: fl
 
 
 def hero():
-    doc = Doc(W, 0, "ApexAi: web data, business communications, and autonomous operations",
-              "ApexAi builds Scrawl and Communications. Operators, software through ApexAPI, and AI agents through "
-              "ApexMCP reach each product through its own authority gate. Opening for business soon.")
+    doc = Doc(W, 0, HERO_TITLE, HERO_DESC)
 
     # Top bar: mark and wordmark, launch state.
     brand_mark(doc, EDGE - 5, 20, 26)
@@ -543,8 +595,9 @@ def hero():
             f'<circle cx="{lx:.1f}" cy="34" r="4" fill="none" stroke="{AMBER}" stroke-width="1.5"/>')
 
     # Statement.
-    head = ["Web data, business", "communications, and", "autonomous operations."]
-    size = min(fit(head[0], 800, 64, wght=560, wdth=112, track=-0.042), 64)
+    head = ["Web data, communications,", "operations, and commerce."]
+    assert " ".join(head) == HERO_HEAD
+    size = min(min(fit(line, 800, 64, wght=560, wdth=112, track=-0.042) for line in head), 64)
     y = 88 + size
     for i, line in enumerate(head):
         doc.text(line, EDGE - 4, y + i * size * 1.0, size, wght=560, wdth=112, track=-0.042)
@@ -773,38 +826,45 @@ def availability():
     for surface in SURFACES:
         cells = [AVAILABILITY[p["name"]][surface] for p in PRODUCTS]
         rows.append(f"{surface}: " + ", ".join(
-            f"{p['name']} {STATES[c][0].lower() if c else 'not a surface'}" for p, c in zip(PRODUCTS, cells)))
+            f"{p['name']} {STATES[c][0].lower() if c else 'not applicable'}" for p, c in zip(PRODUCTS, cells)))
     doc = Doc(W, 0, "Public availability of ApexAi products", ". ".join(rows) + ".")
     y = section_head(doc, "availability")
     ty = y + 34
-    col = [24, 300, 578, 856]
+    first = 188  # the surface column; the products share the rest equally
+    share = (W - 48 - first) / len(PRODUCTS)
+    col = [24] + [24 + first + share * k for k in range(len(PRODUCTS) + 1)]
+    pad, badge_size = 14, 8.5
+    assert max(badge_width(code, badge_size, compact=True) for code in STATES) < share - pad - 6, "a badge is wider than its cell"
     head_h, row_h = 46, 42
     th = head_h + row_h * len(SURFACES)
     inset(doc, 24, ty, W - 48, th, fill=GROUND)
     legend(doc, "Surface", col[0] + 20, ty + 28, size=9.5)
     for k, product in enumerate(PRODUCTS):
-        doc.text(product["name"], col[k + 1] + 20, ty + 29, 15, wght=600, wdth=114, track=-0.015)
+        doc.text(product["name"], col[k + 1] + pad, ty + 29, min(15, fit(product["name"], share - pad - 8, 15, wght=600, wdth=114, track=-0.015)),
+                 wght=600, wdth=114, track=-0.015)
         vline(doc, col[k + 1], ty + 1, ty + th - 1)
     for r, surface in enumerate(SURFACES):
         top = ty + head_h + row_h * r
         hline(doc, 25, W - 25, top - 1, SEAM if r else SEAM_HI)
         cy = top + row_h / 2
-        doc.text(surface, col[0] + 20, cy + 5, 14, wght=500)
+        doc.text(surface, col[0] + 20, cy + 5, 13.5, wght=500)
         for k, product in enumerate(PRODUCTS):
             code = AVAILABILITY[product["name"]][surface]
             if code:
-                badge(doc, code, col[k + 1] + 20, cy)
+                badge(doc, code, col[k + 1] + pad, cy, size=badge_size, compact=True)
             else:
-                doc.text("No such surface", col[k + 1] + 20, cy + 4, 10.5, face="mono", wdth=88, fill=TEXT_3)
+                # The website's dash: the product does not have this surface.
+                doc.add(f'<path d="M{col[k + 1] + pad:.1f} {cy + .5:.1f}h12" stroke="{TEXT_3}" stroke-width="1.5"/>')
 
     # Key: what each state means.
     y = ty + th + 36
-    kw = (W - 48) / 3
+    kw = (W - 48) / len(STATES)
     bottom = y
     for k, code in enumerate(STATES):
         x = EDGE + kw * k
         badge(doc, code, x, y)
         bottom = max(bottom, doc.lines(wrap(STATE_MEANING[code], kw - 26, 12.5), x, y + 32, 12.5, 19, fill=TEXT_2))
+    bottom = doc.lines(["A dash means the product does not have that surface."], EDGE, bottom + 34, 12.5, 19, fill=TEXT_3)
     doc.h = bottom + 34
     finish(doc)
     doc.save("availability.svg")
@@ -919,14 +979,13 @@ def footer(narrow: bool = False):
 # product gate, rails turn vertical, and matrices split into labelled rows.
 
 
-def badge_width(code: str, size: float = 9.5) -> float:
-    return 9 + 6 + 8 + measure(STATES[code][0].upper(), size, wght=640, wdth=118, track=0.1) + 9
+def badge_width(code: str, size: float = 9.5, compact: bool = False) -> float:
+    wdth, track = (100, 0.06) if compact else (118, 0.1)
+    return 9 + 6 + 8 + measure(STATES[code][0].upper(), size, wght=640, wdth=wdth, track=track) + 9
 
 
 def hero_narrow():
-    doc = Doc(NW, 0, "ApexAi: web data, business communications, and autonomous operations",
-              "ApexAi builds Scrawl and Communications. Operators, software through ApexAPI, and AI agents through "
-              "ApexMCP reach each product through its own authority gate. Opening for business soon.")
+    doc = Doc(NW, 0, HERO_TITLE, HERO_DESC)
     brand_mark(doc, NEDGE - 5, 18, 24)
     doc.text("ApexAi", NEDGE + 29, 36, 17, wght=640, wdth=118, track=-0.012)
     state_w = legend(doc, "Opening soon", NW - NEDGE, 34, fill=AMBER, size=10, anchor="end")
@@ -934,8 +993,9 @@ def hero_narrow():
     doc.add(f'<circle cx="{lx:.1f}" cy="30.5" r="6.5" fill="{AMBER}" fill-opacity=".12"/>'
             f'<circle cx="{lx:.1f}" cy="30.5" r="3.6" fill="none" stroke="{AMBER}" stroke-width="1.4"/>')
 
-    head = ["Web data,", "business", "communications,", "and autonomous", "operations."]
-    size = fit(head[-1], NW - 2 * NEDGE + 4, 46, wght=560, wdth=112, track=-0.042)
+    head = ["Web data,", "communications,", "operations, and", "commerce."]
+    assert " ".join(head) == HERO_HEAD
+    size = fit("communications,", NW - 2 * NEDGE + 4, 46, wght=560, wdth=112, track=-0.042)
     y = 70 + size
     for i, line in enumerate(head):
         doc.text(line, NEDGE - 3, y + i * size, size, wght=560, wdth=112, track=-0.042)
@@ -1095,8 +1155,8 @@ def availability_narrow():
     for code in STATES:
         badge(doc, code, NEDGE, y)
         y = doc.lines(wrap(STATE_MEANING[code], NW - 2 * NEDGE, 12), NEDGE, y + 30, 12, 18, fill=TEXT_2) + 32
-    if not all(AVAILABILITY["Scrawl"].values()):
-        y = doc.lines(["Scrawl has no web console surface."], NEDGE, y - 6, 12, 18, fill=TEXT_3) + 32
+    y = doc.lines(wrap("A surface a product does not have is left out. Shop Bot is used in Telegram only.", NW - 2 * NEDGE, 12),
+                  NEDGE, y - 6, 12, 18, fill=TEXT_3) + 32
     doc.h = y - 8
     finish(doc)
     doc.save("availability-narrow.svg")
