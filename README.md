@@ -47,6 +47,8 @@ Each product owns its rules. A person working in Telegram, an application callin
   <br>
   Support: <a href="mailto:support@apexaiofficial.com">support@apexaiofficial.com</a>
   <br>
+  Direct: <a href="https://t.me/ApexAiAdmin">@ApexAiAdmin</a> on Telegram
+  <br>
   <sub>On Telegram:
   <a href="https://t.me/ApexAiOfficial">official updates</a> ·
   <a href="https://t.me/ApexAiCentral">community</a></sub>
