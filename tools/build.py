@@ -1223,6 +1223,7 @@ def main():
     hero()
     button("website", "Visit apexaiofficial.com", primary=True)
     button("updates", "Follow launch updates", primary=False)
+    button("facebook", "Facebook", primary=False)
     button("custom", "Request a custom build", primary=False)
     for product in PRODUCTS:
         product_plate(product)

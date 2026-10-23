@@ -5,6 +5,7 @@
 <p>
   <a href="https://apexaiofficial.com"><img src="assets/button-website.svg" height="42" alt="Visit apexaiofficial.com"></a>
   <a href="https://t.me/ApexAiOfficial"><img src="assets/button-updates.svg" height="42" alt="Follow launch updates on Telegram"></a>
+  <a href="https://www.facebook.com/ApexAiOfficial"><img src="assets/button-facebook.svg" height="42" alt="Follow ApexAi on Facebook"></a>
   <a href="https://apexaiofficial.com/custom-orders"><img src="assets/button-custom.svg" height="42" alt="Request a custom build"></a>
 </p>
 
@@ -49,4 +50,6 @@ Each product owns its rules. A person working in Telegram, an application callin
   <sub>On Telegram:
   <a href="https://t.me/ApexAiOfficial">official updates</a> ·
   <a href="https://t.me/ApexAiCentral">community</a></sub>
+  <br>
+  <sub>On Facebook: <a href="https://www.facebook.com/ApexAiOfficial">@ApexAiOfficial</a></sub>
 </p>
