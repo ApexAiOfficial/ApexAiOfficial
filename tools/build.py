@@ -90,7 +90,7 @@ AVAILABILITY = {
         "Telegram operator": "BUILT",
         "Web console": "BUILT",
         "ApexAPI": "BUILT",
-        "ApexMCP": "PLANNED",
+        "ApexMCP": "BUILT",
         "Product plugin": "PLANNED",
         "Hosted service": "NOT_PUBLICLY_HOSTED",
     },
