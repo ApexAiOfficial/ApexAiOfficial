@@ -67,12 +67,15 @@ STATES = {
 
 STATE_MEANING = {
     "BUILT": "Built and verified in the product, not yet released to customers.",
-    "IN_DEVELOPMENT": "Being built: partly implemented, or complete but not yet merged and verified.",
+    "IN_DEVELOPMENT": "Being built: partly implemented, or complete but not yet merged and verified. Not released.",
     "PLANNED": "Part of the product direction; not built yet.",
-    "NOT_PUBLICLY_HOSTED": "No public managed service, sign-up, or endpoint.",
+    "NOT_PUBLICLY_HOSTED": "No public managed service, sign-up, or public endpoint is offered.",
 }
 
-SURFACES = ["Operations engine", "Telegram operator", "Web console", "ApexAPI", "ApexMCP", "Product plugin", "Hosted service"]
+# The website's matrix order (content/developers.ts developerMatrixSurfaces). "SDK" and "Agent plugin" are the
+# ApexSDK developer kits; "Product plugin" is operator control for a deployment, a different thing.
+SURFACES = ["Operations engine", "Telegram operator", "Web console", "ApexAPI", "ApexMCP", "SDK", "Agent plugin",
+            "Product plugin", "Hosted service"]
 
 # None means the product does not have that surface (the website shows a dash): never a state of its own.
 AVAILABILITY = {
@@ -82,6 +85,8 @@ AVAILABILITY = {
         "Web console": None,  # Scrawl has no web console surface.
         "ApexAPI": "BUILT",
         "ApexMCP": "BUILT",
+        "SDK": "BUILT",
+        "Agent plugin": "BUILT",
         "Product plugin": "IN_DEVELOPMENT",
         "Hosted service": "NOT_PUBLICLY_HOSTED",
     },
@@ -91,6 +96,8 @@ AVAILABILITY = {
         "Web console": "BUILT",
         "ApexAPI": "BUILT",
         "ApexMCP": "BUILT",
+        "SDK": None,  # Communications has no developer kit.
+        "Agent plugin": None,
         "Product plugin": "PLANNED",
         "Hosted service": "NOT_PUBLICLY_HOSTED",
     },
@@ -100,6 +107,8 @@ AVAILABILITY = {
         "Web console": None,
         "ApexAPI": "PLANNED",
         "ApexMCP": "PLANNED",
+        "SDK": "IN_DEVELOPMENT",  # Its kits are public, but the engine they need is still in development.
+        "Agent plugin": "IN_DEVELOPMENT",
         "Product plugin": None,  # DevOps is an operations product, not a plugin for one.
         "Hosted service": "NOT_PUBLICLY_HOSTED",
     },
@@ -109,13 +118,17 @@ AVAILABILITY = {
         "Web console": None,
         "ApexAPI": None,  # Shop Bot is used in Telegram only: no ApexAPI or ApexMCP surface, current or planned.
         "ApexMCP": None,
+        "SDK": None,
+        "Agent plugin": None,
         "Product plugin": None,
-        "Hosted service": "NOT_PUBLICLY_HOSTED",  # The managed white-label service is planned.
+        "Hosted service": "NOT_PUBLICLY_HOSTED",  # The managed white-label service is in development.
     },
 }
+assert all(list(cells) == SURFACES for cells in AVAILABILITY.values()), "every product lists every surface, in order"
+assert all(code in STATES for cells in AVAILABILITY.values() for code in cells.values() if code), "a state has no badge"
 
 # ---------------------------------------------------------------------------
-# Content (apexaiofficial.com content/products.ts, plugins.ts, custom-orders.ts)
+# Content (apexaiofficial.com content/products.ts, plugins.ts, custom-orders.ts, apexsdk.ts)
 
 PRODUCTS = [
     {
@@ -249,8 +262,8 @@ HERO_DESC = ("ApexAi builds Scrawl, Communications, DevOps, and Shop Bot. Operat
 HEADS = {
     "availability": ("Public availability", "Opening for business soon.",
                      "Scrawl and Communications are in development with their core capabilities built, and Shop Bot "
-                     "is built; the DevOps engine is in development, and the managed DevOps and Shop Bot services are "
-                     "planned. Sign-up, hosted access, and pricing open at launch."),
+                     "is built; the DevOps engine and the managed Shop Bot service are in development, and the managed "
+                     "DevOps service is planned. Sign-up, hosted access, and pricing open at launch."),
     "access": ("Access layers", "Software and agents reach the same product.",
                "Every caller reaches the product's own core, so adding a caller never adds a way around its "
                "rules. Each product owns its contracts, and there is no shared gateway. DevOps access through "
@@ -258,6 +271,13 @@ HEADS = {
     "custom": ("Custom orders", "Bespoke software, scoped before it is built.",
                "Bots, integrations, automation, and agent tooling close to what ApexAi already builds in its "
                "products. Each request is scoped individually and quoted after scope is agreed."),
+    # apexaiofficial.com /apexsdk (content/apexsdk.ts, kitDistribution in content/availability.ts). A public
+    # repository is distribution, not availability: the lede keeps what each kit needs next to where it lives.
+    "apexsdk": ("Developer kits", "ApexSDK: SDKs and agent plugins for Scrawl and DevOps.",
+                "Each kit belongs to one product and talks only to that product. All four are open source on GitHub "
+                "under the Apache License 2.0, and none is on a package registry or in an official plugin directory "
+                "yet. Each works only with its product as an ApexAi-operated service, which is not offered publicly "
+                "yet."),
     "open": ("Open source", "Guides, kits, and tools you can use today.", None),
 }
 CUSTOM_NOTE = "ApexAi declines work that depends on bypassing consent, platform rules, access controls, or the law."
@@ -319,6 +339,23 @@ REPOS = [
      "Deploy and operate one Python Telegram bot on Android Termux, with strict token safety."),
     ("cookie-manager", "CLI", "Python",
      "Inspect, export, and replay browser cookies you control, with redacted values and correctly scoped replay."),
+]
+
+# The ApexSDK developer kits (apexaiofficial.com content/apexsdk.ts), each with its website name as the card's
+# title. DevOps kits are described by function only: never the engine's package, tools, settings, or versions.
+SDK_REPOS = [
+    ("scrawl-sdk", "SDK", "Python · TypeScript · Apache-2.0",
+     "Python and TypeScript SDKs and a command-line tool that call Scrawl's ApexAPI.",
+     "scrawl-sdk: Scrawl SDKs and CLI"),
+    ("scrawl-plugin", "Agent plugin", "Claude Code · Codex · Apache-2.0",
+     "Scrawl's agent plugin for Claude Code and OpenAI Codex: skills and a connection to Scrawl's ApexMCP.",
+     "scrawl-plugin: Scrawl agent plugin"),
+    ("devops-sdk", "SDK", "Python · Apache-2.0",
+     "Integration SDK for connecting your systems to the DevOps engine, with adapters and contract tests.",
+     "devops-sdk: DevOps SDK"),
+    ("devops-plugin", "Agent plugin", "Claude Code · Apache-2.0",
+     "Read-only inspection of a DevOps engine installation from Claude Code: every tool it offers is a read.",
+     "devops-plugin: DevOps agent plugin"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -834,6 +871,7 @@ def availability():
     col = [24] + [24 + first + share * k for k in range(len(PRODUCTS) + 1)]
     pad, badge_size = 14, 8.5
     assert max(badge_width(code, badge_size, compact=True) for code in STATES) < share - pad - 6, "a badge is wider than its cell"
+    assert max(measure(s, 13.5, wght=500) for s in SURFACES) < first - 20 - 12, "a surface name is wider than its column"
     head_h, row_h = 46, 42
     th = head_h + row_h * len(SURFACES)
     inset(doc, 24, ty, W - 48, th, fill=GROUND)
@@ -858,6 +896,8 @@ def availability():
     # Key: what each state means.
     y = ty + th + 36
     kw = (W - 48) / len(STATES)
+    # The key is one row of full-size badges: a further state needs the row wrapped first.
+    assert max(badge_width(code) for code in STATES) < kw - 16, "a key badge is wider than its column"
     bottom = y
     for k, code in enumerate(STATES):
         x = EDGE + kw * k
@@ -922,19 +962,32 @@ def custom_orders():
     doc.save("custom-orders.svg")
 
 
-def open_source_head(narrow: bool = False):
-    doc = Doc(NW if narrow else W, 0, "Open source from ApexAi", HEADS["open"][1])
-    y = section_head(doc, "open", y=40 if narrow else 44, edge=NEDGE if narrow else EDGE, size=21 if narrow else 24)
+def card_head(key: str, title: str, name: str, narrow: bool = False):
+    """A slim head plate introducing a block of repository cards."""
+    _, statement, lede = HEADS[key]
+    doc = Doc(NW if narrow else W, 0, title, f"{statement} {lede}" if lede else statement)
+    y = section_head(doc, key, y=40 if narrow else 44, edge=NEDGE if narrow else EDGE, size=21 if narrow else 24,
+                     body=13.5 if narrow else 15)
     doc.h = y + (24 if narrow else 28)
     finish(doc)
-    doc.save("open-source-narrow.svg" if narrow else "open-source.svg")
+    doc.save(f"{name}-narrow.svg" if narrow else f"{name}.svg")
 
 
-def repo_card(name: str, kind: str, meta: str, desc: str, filename: str | None = None):
+def open_source_head(narrow: bool = False):
+    card_head("open", "Open source from ApexAi", "open-source", narrow)
+
+
+def apexsdk_head(narrow: bool = False):
+    card_head("apexsdk", "ApexSDK: developer kits from ApexAi", "apexsdk", narrow)
+
+
+def repo_card(name: str, kind: str, meta: str, desc: str, filename: str | None = None, title: str | None = None):
     w, h = 412, 150
-    doc = Doc(w, h, f"{name}: {kind.lower()}", desc)
-    legend(doc, kind, 24, 36, size=9.5)
-    doc.text(meta, w - 24, 36, 10, face="mono", wdth=88, fill=TEXT_3, anchor="end")
+    # The title names the card in words; an acronym kind (SDK) passes its own title rather than being lowercased.
+    doc = Doc(w, h, title or f"{name}: {kind.lower()}", desc)
+    kind_w = legend(doc, kind, 24, 36, size=9.5)
+    meta_w = doc.text(meta, w - 24, 36, 10, face="mono", wdth=88, fill=TEXT_3, anchor="end")
+    assert 24 + kind_w + 16 < w - 24 - meta_w, f"{name}: kind and meta labels collide"
     size = min(21, fit(name, w - 48, 21, wght=600, wdth=112, track=-0.02))
     doc.text(name, 23, 72, size, wght=600, wdth=112, track=-0.02)
     lines = wrap(desc, w - 48, 13.5)
@@ -1150,7 +1203,8 @@ def availability_narrow():
             top = ty + 44 + row * r
             hline(doc, NIN + 1, NIN + pw - 1, top - 1, SEAM if r else SEAM_HI)
             cy = top + row / 2
-            doc.text(surface, NEDGE, cy + 4.5, 13, wght=500)
+            label_w = doc.text(surface, NEDGE, cy + 4.5, 13, wght=500)
+            assert NEDGE + label_w + 12 < NW - NEDGE - badge_width(code), f"{product['name']} {surface}: label meets its badge"
             badge(doc, code, NW - NEDGE - badge_width(code), cy)
         y = ty + th - 6
     y += 36
@@ -1229,6 +1283,9 @@ def main():
         product_plate(product)
     availability()
     access()
+    apexsdk_head()
+    for name, kind, meta, desc, title in SDK_REPOS:
+        repo_card(name, kind, meta, desc, title=title)
     custom_orders()
     open_source_head()
     for repo in REPOS:
@@ -1241,6 +1298,7 @@ def main():
         product_narrow(product)
     availability_narrow()
     access_narrow()
+    apexsdk_head(narrow=True)
     custom_orders_narrow()
     open_source_head(narrow=True)
     footer(narrow=True)
