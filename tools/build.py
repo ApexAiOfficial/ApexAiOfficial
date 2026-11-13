@@ -47,6 +47,7 @@ SIGNAL = "#72aaff"
 SIGNAL_HI = "#b4d2ff"
 AMBER = "#e5a352"
 ROSE = "#df8a8a"
+MINT = "#7fcf95"
 
 W = 880  # README column is ~846px on github.com; images scale to fit.
 NW = 420  # Narrow variants, served below 640px through <picture>; phones show them at ~0.85x.
@@ -63,6 +64,7 @@ STATES = {
     "IN_DEVELOPMENT": ("In development", SIGNAL_HI, "rgba(114,170,255,.38)", SIGNAL, "ring"),
     "PLANNED": ("Planned", "#f2cf9f", "rgba(229,163,82,.55)", AMBER, "dashed"),
     "NOT_PUBLICLY_HOSTED": ("Not publicly hosted", "#efc0c0", "rgba(223,138,138,.42)", ROSE, "ring"),
+    "PUBLIC_BETA": ("Public beta", "#c4ecd0", "rgba(127,207,149,.55)", MINT, "solid"),
 }
 
 STATE_MEANING = {
@@ -70,6 +72,7 @@ STATE_MEANING = {
     "IN_DEVELOPMENT": "Being built: partly implemented, or complete but not yet merged and verified. Not released.",
     "PLANNED": "Part of the product direction; not built yet.",
     "NOT_PUBLICLY_HOSTED": "No public managed service, sign-up, or public endpoint is offered.",
+    "PUBLIC_BETA": "Open to anyone for a fixed-term beta, while places last.",
 }
 
 # The website's matrix order (content/developers.ts developerMatrixSurfaces). "SDK" and "Agent plugin" are the
@@ -116,12 +119,14 @@ AVAILABILITY = {
         "Operations engine": None,
         "Telegram operator": "BUILT",  # The merchant's staff run the store from the bot's admin commands.
         "Web console": None,
-        "ApexAPI": None,  # Shop Bot is used in Telegram only: no ApexAPI or ApexMCP surface, current or planned.
+        # Each managed store has its own merchant API and MCP endpoint, separate from ApexAPI and ApexMCP.
+        "ApexAPI": None,
         "ApexMCP": None,
-        "SDK": None,
-        "Agent plugin": None,
+        "SDK": "BUILT",  # shop-sdk: the Python client for a store's merchant API.
+        "Agent plugin": "BUILT",  # shop-plugin: Claude Code on a store's MCP endpoint.
         "Product plugin": None,
-        "Hosted service": "NOT_PUBLICLY_HOSTED",  # The managed white-label service is in development.
+        # The website projects the live cohort (content/availability.ts): open on 2026-11-13.
+        "Hosted service": "PUBLIC_BETA",
     },
 }
 assert all(list(cells) == SURFACES for cells in AVAILABILITY.values()), "every product lists every surface, in order"
@@ -256,28 +261,30 @@ HERO_RULE = "Each product owns its gate: every caller passes the same product po
 HERO_TITLE = "ApexAi: web data, business communications, autonomous operations, and Telegram commerce"
 HERO_DESC = ("ApexAi builds Scrawl, Communications, DevOps, and Shop Bot. Operators, software through ApexAPI, and AI agents "
              "through ApexMCP reach each product through its own authority gate; DevOps access through ApexAPI and ApexMCP "
-             "is planned, and Shop Bot is used in Telegram only. Opening for business soon.")
+             "is planned. Shop Bot's managed service is in public beta, and each store has its own merchant API and MCP "
+             "endpoint.")
 
 
 HEADS = {
-    "availability": ("Public availability", "Opening for business soon.",
-                     "Scrawl and Communications are in development with their core capabilities built, and Shop Bot "
-                     "is built; the DevOps engine and the managed Shop Bot service are in development, and the managed "
-                     "DevOps service is planned. Sign-up, hosted access, and pricing open at launch."),
+    "availability": ("Public availability", "Shop Bot is open in public beta.",
+                     "Shop Bot is built and its managed service is in public beta: anyone can open a store in "
+                     "@ApexAiStores_bot while places last. Scrawl and Communications are in development with their core "
+                     "capabilities built, the DevOps engine is in development, and the managed DevOps service is planned. "
+                     "Their sign-up, hosted access, and pricing open at launch."),
     "access": ("Access layers", "Software and agents reach the same product.",
                "Every caller reaches the product's own core, so adding a caller never adds a way around its "
                "rules. Each product owns its contracts, and there is no shared gateway. DevOps access through "
-               "ApexAPI and ApexMCP is planned; Shop Bot is used in Telegram only."),
+               "ApexAPI and ApexMCP is planned. A Shop Bot store has its own merchant API and MCP endpoint instead."),
     "custom": ("Custom orders", "Bespoke software, scoped before it is built.",
                "Bots, integrations, automation, and agent tooling close to what ApexAi already builds in its "
                "products. Each request is scoped individually and quoted after scope is agreed."),
     # apexaiofficial.com /apexsdk (content/apexsdk.ts, kitDistribution in content/availability.ts). A public
     # repository is distribution, not availability: the lede keeps what each kit needs next to where it lives.
-    "apexsdk": ("Developer kits", "ApexSDK: SDKs and agent plugins for Scrawl and DevOps.",
-                "Each kit belongs to one product and talks only to that product. All four are open source on GitHub "
+    "apexsdk": ("Developer kits", "ApexSDK: SDKs and agent plugins for Scrawl, DevOps, and Shop Bot.",
+                "Each kit belongs to one product and talks only to that product. All six are open source on GitHub "
                 "under the Apache License 2.0, and none is on a package registry or in an official plugin directory "
-                "yet. Each works only with its product as an ApexAi-operated service, which is not offered publicly "
-                "yet."),
+                "yet. Each works only with its product as an ApexAi-operated service: Shop Bot's is in public beta, "
+                "and the others are not offered publicly yet."),
     "open": ("Open source", "Guides, kits, and tools you can use today.", None),
 }
 CUSTOM_NOTE = "ApexAi declines work that depends on bypassing consent, platform rules, access controls, or the law."
@@ -356,6 +363,12 @@ SDK_REPOS = [
     ("devops-plugin", "Agent plugin", "Claude Code · Apache-2.0",
      "Read-only inspection of a DevOps engine installation from Claude Code: every tool it offers is a read.",
      "devops-plugin: DevOps agent plugin"),
+    ("shop-sdk", "SDK", "Python · Apache-2.0",
+     "Python client for a Shop Bot store's merchant API: catalog, stock, orders, coupons, and reports.",
+     "shop-sdk: Shop SDK"),
+    ("shop-plugin", "Agent plugin", "Claude Code · Apache-2.0",
+     "Run a Shop Bot store from Claude Code through its MCP endpoint, with confirmations and Telegram approvals.",
+     "shop-plugin: Shop agent plugin"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -895,14 +908,20 @@ def availability():
 
     # Key: what each state means.
     y = ty + th + 36
-    kw = (W - 48) / len(STATES)
-    # The key is one row of full-size badges: a further state needs the row wrapped first.
+    # The key: one row of full-size badges for up to four states, then rows of three.
+    per_row = len(STATES) if len(STATES) <= 4 else 3
+    kw = (W - 48) / per_row
     assert max(badge_width(code) for code in STATES) < kw - 16, "a key badge is wider than its column"
+    codes = list(STATES)
     bottom = y
-    for k, code in enumerate(STATES):
-        x = EDGE + kw * k
-        badge(doc, code, x, y)
-        bottom = max(bottom, doc.lines(wrap(STATE_MEANING[code], kw - 26, 12.5), x, y + 32, 12.5, 19, fill=TEXT_2))
+    for start in range(0, len(codes), per_row):
+        row_bottom = y
+        for k, code in enumerate(codes[start:start + per_row]):
+            x = EDGE + kw * k
+            badge(doc, code, x, y)
+            row_bottom = max(row_bottom, doc.lines(wrap(STATE_MEANING[code], kw - 26, 12.5), x, y + 32, 12.5, 19, fill=TEXT_2))
+        bottom = row_bottom
+        y = row_bottom + 30
     bottom = doc.lines(["A dash means the product does not have that surface."], EDGE, bottom + 34, 12.5, 19, fill=TEXT_3)
     doc.h = bottom + 34
     finish(doc)
@@ -1211,7 +1230,7 @@ def availability_narrow():
     for code in STATES:
         badge(doc, code, NEDGE, y)
         y = doc.lines(wrap(STATE_MEANING[code], NW - 2 * NEDGE, 12), NEDGE, y + 30, 12, 18, fill=TEXT_2) + 32
-    y = doc.lines(wrap("A surface a product does not have is left out. Shop Bot is used in Telegram only.", NW - 2 * NEDGE, 12),
+    y = doc.lines(wrap("A surface a product does not have is left out.", NW - 2 * NEDGE, 12),
                   NEDGE, y - 6, 12, 18, fill=TEXT_3) + 32
     doc.h = y - 8
     finish(doc)
